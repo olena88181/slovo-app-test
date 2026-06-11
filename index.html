@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>slovo</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #08080f;
+    --bg2: #111118;
+    --bg3: #1a1a24;
+    --border: #22222e;
+    --text: #f0f0f8;
+    --text2: #9090a8;
+    --text3: #44445a;
+    --violet: #a78bfa;
+    --violet-dim: rgba(167,139,250,0.15);
+    --violet-border: rgba(167,139,250,0.3);
+    --green: #34d399;
+    --green-dim: rgba(52,211,153,0.12);
+    --green-border: rgba(52,211,153,0.3);
+    --blue: #60a5fa;
+    --blue-dim: rgba(96,165,250,0.12);
+    --pink: #f472b6;
+    --pink-dim: rgba(244,114,182,0.12);
+    --pink-border: rgba(244,114,182,0.3);
+    --amber: #fbbf24;
+    --amber-dim: rgba(251,191,36,0.12);
+    --red: #f87171;
+    --red-dim: rgba(248,113,113,0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    background: var(--bg);
+    font-family: 'Inter', sans-serif;
+    color: var(--text);
+    touch-action: none;
+  }
+
+  /* ── APP SHELL ── */
+  #app {
+    width: 100%;
+    height: 100%;
+    max-width: 430px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ── SCREENS ── */
+  .screen {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .screen.active { opacity: 1; pointer-events: all; }
+
+  /* ══════════════════════════════
+     ONBOARDING
+  ══════════════════════════════ */
+  #screen-onboard {
+    background: var(--bg);
+    padding: 60px 28px 48px;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+  }
+
+  .ob-logo {
+    font-size: 48px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #a78bfa 0%, #60a5fa 50%, #34d399 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -2px;
+    margin-bottom: 8px;
+  }
+  .ob-tagline {
+    font-size: 15px;
+    color: var(--text2);
+    line-height: 1.6;
+    max-width: 260px;
+    margin: 0 auto 40px;
+  }
+
+  .ob-section-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 12px;
+    text-align: left;
+    width: 100%;
+  }
+
+  .ob-levels {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    margin-bottom: 28px;
+  }
+
+  .ob-level-btn {
+    background: var(--bg2);
+    border: 0.5px solid var(--border);
+    border-radius: 16px;
+    padding: 14px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+  }
+  .ob-level-btn:active { transform: scale(0.98); }
+  .ob-level-btn.selected {
+    background: var(--violet-dim);
+    border-color: var(--violet-border);
+  }
+  .ob-level-name { font-size: 14px; font-weight: 500; color: var(--text); }
+  .ob-level-desc { font-size: 12px; color: var(--text2); margin-top: 2px; }
+  .ob-level-tag {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--violet);
+    background: var(--violet-dim);
+    padding: 3px 8px;
+    border-radius: 8px;
+  }
+  .ob-level-btn.selected .ob-level-tag { opacity: 1; }
+
+  .ob-start-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(90deg, #a78bfa, #60a5fa);
+    border: none;
+    border-radius: 16px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: -0.2px;
+  }
+  .ob-start-btn:active { transform: scale(0.98); opacity: 0.9; }
+  .ob-start-btn:disabled { opacity: 0.25; cursor: default; }
+
+  /* ══════════════════════════════
+     FEED SCREEN
+  ══════════════════════════════ */
+  #screen-feed { background: var(--bg); }
+
+  .feed-topbar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    z-index: 20;
+    padding: 52px 20px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    pointer-events: none;
+  }
+
+  .feed-logo {
+    font-size: 18px;
+    font-weight: 700;
+    background: linear-gradient(90deg, #a78bfa, #60a5fa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
+  }
+
+  .feed-streak {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--amber);
+    pointer-events: all;
+  }
+
+  /* card viewport */
+  .card-viewport {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+
+  /* ── CARDS ── */
+  .card {
+    position: absolute;
+    inset: 0;
+    padding: 100px 24px 100px;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+    will-change: opacity;
+  }
+  .card.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  /* card backgrounds */
+  .card-bg-new    { background: radial-gradient(ellipse at 20% 20%, rgba(167,139,250,0.07) 0%, transparent 60%), var(--bg); }
+  .card-bg-quiz   { background: radial-gradient(ellipse at 80% 10%, rgba(96,165,250,0.06) 0%, transparent 60%), var(--bg); }
+  .card-bg-repeat { background: radial-gradient(ellipse at 10% 80%, rgba(251,191,36,0.06) 0%, transparent 60%), var(--bg); }
+  .card-bg-fill   { background: radial-gradient(ellipse at 70% 80%, rgba(52,211,153,0.06) 0%, transparent 60%), var(--bg); }
+
+  /* ── BADGE ── */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    align-self: flex-start;
+    margin-bottom: 20px;
+    letter-spacing: 0.03em;
+  }
+  .badge-violet { background: var(--violet-dim); color: var(--violet); border: 0.5px solid var(--violet-border); }
+  .badge-green  { background: var(--green-dim);  color: var(--green);  border: 0.5px solid var(--green-border); }
+  .badge-blue   { background: var(--blue-dim);   color: var(--blue);   border: 0.5px solid rgba(96,165,250,0.3); }
+  .badge-amber  { background: var(--amber-dim);  color: var(--amber);  border: 0.5px solid rgba(251,191,36,0.3); }
+  .badge-pink   { background: var(--pink-dim);   color: var(--pink);   border: 0.5px solid var(--pink-border); }
+
+  /* ── NEW WORD CARD ── */
+  .word-en {
+    font-size: 40px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -1.5px;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .word-phonetic {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--text3);
+    margin-bottom: 20px;
+  }
+
+  .reveal-area {
+    margin-bottom: 20px;
+  }
+  .word-ua {
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--violet);
+    line-height: 1.3;
+    margin-bottom: 8px;
+    transition: filter 0.35s ease, color 0.35s ease;
+  }
+  .word-ua.blurred {
+    filter: blur(12px);
+    color: var(--text3);
+    user-select: none;
+  }
+  .reveal-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--violet-dim);
+    border: 0.5px solid var(--violet-border);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--violet);
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .reveal-btn:active { transform: scale(0.96); }
+
+  .divider {
+    height: 0.5px;
+    background: linear-gradient(90deg, var(--violet-border), transparent);
+    margin-bottom: 16px;
+  }
+  .ex-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 8px;
+  }
+  .ex-sentence {
+    font-size: 14px;
+    color: var(--text2);
+    line-height: 1.7;
+  }
+  .ex-highlight { color: var(--violet); font-weight: 600; }
+  .ex-highlight-blue { color: var(--blue); font-weight: 600; }
+  .ex-highlight-green { color: var(--green); font-weight: 600; }
+
+  /* ── QUIZ CARD ── */
+  .quiz-question {
+    font-size: 13px;
+    color: var(--text3);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+  .quiz-word {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -1px;
+    margin-bottom: 28px;
+    line-height: 1;
+  }
+  .quiz-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .quiz-opt {
+    background: var(--bg2);
+    border: 0.5px solid var(--border);
+    border-radius: 16px;
+    padding: 14px 10px;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: center;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+    line-height: 1.3;
+  }
+  .quiz-opt:active { transform: scale(0.96); }
+  .quiz-opt.correct { background: var(--green-dim); border-color: var(--green-border); color: var(--green); }
+  .quiz-opt.wrong   { background: var(--red-dim);   border-color: rgba(248,113,113,0.3); color: var(--red); }
+  .quiz-opt.shake   { animation: shake 0.3s ease; }
+
+  /* ── REPEAT CARD ── */
+  .repeat-center {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-align: center;
+  }
+  .repeat-word { font-size: 42px; font-weight: 700; color: var(--text); letter-spacing: -1.5px; }
+  .repeat-phonetic { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text3); }
+  .repeat-ua { font-size: 20px; font-weight: 500; color: var(--violet); margin-top: 4px; }
+  .repeat-tag {
+    position: absolute;
+    top: 96px; right: 24px;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 10px;
+    background: var(--pink-dim);
+    color: var(--pink);
+    border: 0.5px solid var(--pink-border);
+  }
+  .swipe-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 4px;
+    margin-bottom: 8px;
+  }
+  .swipe-btn {
+    padding: 13px 24px;
+    border-radius: 28px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.15s;
+  }
+  .swipe-btn:active { transform: scale(0.94); }
+  .swipe-no  { background: var(--pink-dim);  color: var(--pink);  border: 0.5px solid var(--pink-border); }
+  .swipe-yes { background: var(--green-dim); color: var(--green); border: 0.5px solid var(--green-border); }
+  .swipe-hint { font-size: 11px; color: var(--text3); }
+
+  /* ── FILL CARD ── */
+  .fill-sentence {
+    font-size: 16px;
+    color: var(--text2);
+    line-height: 2.1;
+    margin-bottom: 24px;
+  }
+  .fill-blank {
+    display: inline-block;
+    min-width: 90px;
+    height: 26px;
+    border-bottom: 2px solid var(--violet);
+    vertical-align: bottom;
+    margin: 0 4px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--violet);
+    transition: all 0.3s;
+  }
+  .fill-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .fill-opt {
+    background: var(--bg2);
+    border: 0.5px solid var(--border);
+    border-radius: 22px;
+    padding: 9px 18px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .fill-opt:active { transform: scale(0.96); }
+  .fill-opt.correct { background: var(--green-dim); border-color: var(--green-border); color: var(--green); }
+  .fill-opt.wrong   { background: var(--red-dim);   border-color: rgba(248,113,113,0.3); color: var(--red); }
+
+  /* ── SPACER & DOTS ── */
+  .spacer { flex: 1; }
+  .progress-dots { display: none; }
+
+  /* ── VERTICAL PROGRESS BAR ── */
+  #progress-bar-wrap {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 25;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    pointer-events: none;
+  }
+  .pbar-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--bg3);
+    transition: all 0.3s ease;
+  }
+  .pbar-dot.active {
+    height: 18px;
+    border-radius: 2px;
+    background: var(--violet);
+  }
+  .pbar-dot.done { background: var(--text3); }
+
+  /* ── BOTTOM NAV ── */
+  .bottom-nav {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    z-index: 20;
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0 28px;
+    background: linear-gradient(to top, var(--bg) 60%, transparent);
+    pointer-events: all;
+  }
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--text3);
+    cursor: pointer;
+    transition: color 0.2s;
+    padding: 4px 16px;
+  }
+  .nav-item.active { color: var(--violet); }
+  .nav-icon { font-size: 22px; line-height: 1; }
+
+  /* ── TOAST BANNER ── */
+  .toast {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    background: var(--bg3);
+    border: 0.5px solid var(--border);
+    border-radius: 24px;
+    padding: 24px 36px;
+    text-align: center;
+    z-index: 100;
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    max-width: 240px;
+    width: 90%;
+    backdrop-filter: blur(12px);
+  }
+  .toast.show { transform: translate(-50%, -50%) scale(1); }
+  .toast-emoji { font-size: 40px; margin-bottom: 8px; }
+  .toast-msg { font-size: 15px; font-weight: 600; color: var(--text); }
+  .toast-sub { font-size: 12px; color: var(--text2); margin-top: 4px; }
+
+  /* ── COMPLETION SCREEN ── */
+  #screen-done {
+    background: var(--bg);
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 40px 28px;
+    gap: 20px;
+  }
+  .done-emoji { font-size: 64px; }
+  .done-title { font-size: 28px; font-weight: 700; color: var(--text); letter-spacing: -0.5px; }
+  .done-sub { font-size: 15px; color: var(--text2); line-height: 1.6; max-width: 280px; }
+  .done-stats {
+    display: flex;
+    gap: 16px;
+    margin: 8px 0;
+  }
+  .done-stat {
+    background: var(--bg2);
+    border: 0.5px solid var(--border);
+    border-radius: 16px;
+    padding: 14px 20px;
+    text-align: center;
+  }
+  .done-stat-num { font-size: 28px; font-weight: 700; color: var(--violet); letter-spacing: -1px; }
+  .done-stat-lbl { font-size: 11px; color: var(--text3); font-weight: 500; margin-top: 2px; }
+  .done-restart {
+    width: 100%;
+    max-width: 300px;
+    padding: 16px;
+    background: linear-gradient(90deg, #a78bfa, #60a5fa);
+    border: none;
+    border-radius: 16px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .done-restart:active { transform: scale(0.98); }
+
+  /* ── ANIMATIONS ── */
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    25%      { transform: translateX(-7px); }
+    75%      { transform: translateX(7px); }
+  }
+  @keyframes pulse-correct {
+    0%   { box-shadow: 0 0 0 0 rgba(52,211,153,0.4); }
+    70%  { box-shadow: 0 0 0 12px rgba(52,211,153,0); }
+    100% { box-shadow: 0 0 0 0 rgba(52,211,153,0); }
+  }
+
+  /* ── SAFE AREA ── */
+  @supports (padding-top: env(safe-area-inset-top)) {
+    .feed-topbar { padding-top: calc(env(safe-area-inset-top) + 12px); }
+    .bottom-nav  { padding-bottom: calc(env(safe-area-inset-bottom) + 10px); }
+    #screen-onboard { padding-top: calc(env(safe-area-inset-top) + 40px); }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ══ ONBOARDING ══ -->
+  <div id="screen-onboard" class="screen active">
+    <div style="width:100%;text-align:center">
+      <div class="ob-logo">slovo</div>
+      <p class="ob-tagline">Вивчай англійські слова у форматі стрічки. Від свого рівня — до C2.</p>
+    </div>
+
+    <div style="width:100%">
+      <p class="ob-section-label">Обери свій рівень</p>
+      <div class="ob-levels">
+        <div class="ob-level-btn" onclick="selectLevel(this,'a1')">
+          <div>
+            <div class="ob-level-name">A1 · Початківець</div>
+            <div class="ob-level-desc">Знаю кілька базових слів</div>
+          </div>
+          <span class="ob-level-tag">A1</span>
+        </div>
+        <div class="ob-level-btn" onclick="selectLevel(this,'b1')">
+          <div>
+            <div class="ob-level-name">B1 · Середній</div>
+            <div class="ob-level-desc">Можу підтримати розмову</div>
+          </div>
+          <span class="ob-level-tag">B1</span>
+        </div>
+        <div class="ob-level-btn" onclick="selectLevel(this,'b2')">
+          <div>
+            <div class="ob-level-name">B2 · Вище середнього</div>
+            <div class="ob-level-desc">Розумію фільми без субтитрів</div>
+          </div>
+          <span class="ob-level-tag">B2</span>
+        </div>
+        <div class="ob-level-btn" onclick="selectLevel(this,'c1')">
+          <div>
+            <div class="ob-level-name">C1 · Просунутий</div>
+            <div class="ob-level-desc">Читаю книги в оригіналі</div>
+          </div>
+          <span class="ob-level-tag">C1</span>
+        </div>
+      </div>
+      <button class="ob-start-btn" id="start-btn" disabled onclick="startFeed()">Почати →</button>
+    </div>
+  </div>
+
+  <!-- ══ FEED ══ -->
+  <div id="screen-feed" class="screen">
+    <div class="feed-topbar">
+      <span class="feed-logo">slovo</span>
+      <span class="feed-streak">🔥 <span id="streak-count">1</span> день</span>
+    </div>
+
+    <div class="card-viewport" id="card-viewport">
+      <!-- cards injected by JS -->
+    </div>
+
+    <div id="progress-bar-wrap">
+      <!-- dots injected by JS -->
+    </div>
+
+    <div class="bottom-nav">
+      <div class="nav-item active">
+        <div class="nav-icon">⚡</div>
+        <span>стрічка</span>
+      </div>
+      <div class="nav-item">
+        <div class="nav-icon">📚</div>
+        <span>слова</span>
+      </div>
+      <div class="nav-item">
+        <div class="nav-icon">📊</div>
+        <span>прогрес</span>
+      </div>
+      <div class="nav-item">
+        <div class="nav-icon">👤</div>
+        <span>профіль</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ DONE ══ -->
+  <div id="screen-done" class="screen">
+    <div class="done-emoji">🎓</div>
+    <div class="done-title">Сесію завершено!</div>
+    <p class="done-sub">Ти опрацювала слова на сьогодні. Повтор — завтра.</p>
+    <div class="done-stats">
+      <div class="done-stat">
+        <div class="done-stat-num" id="stat-correct">0</div>
+        <div class="done-stat-lbl">правильно</div>
+      </div>
+      <div class="done-stat">
+        <div class="done-stat-num" id="stat-words">0</div>
+        <div class="done-stat-lbl">нових слів</div>
+      </div>
+      <div class="done-stat">
+        <div class="done-stat-num" id="stat-streak">1</div>
+        <div class="done-stat-lbl">днів поспіль</div>
+      </div>
+    </div>
+    <button class="done-restart" onclick="restartFeed()">↺ Ще раз</button>
+  </div>
+
+  <!-- ══ TOAST ══ -->
+  <div class="toast" id="toast">
+    <div class="toast-emoji" id="toast-emoji">🎉</div>
+    <div class="toast-msg"  id="toast-msg">Правильно!</div>
+    <div class="toast-sub"  id="toast-sub"></div>
+  </div>
+
+</div>
+
+<script>
+// ════════════════════════════════════════
+// WORD DATABASE — CEFR levels
+// ════════════════════════════════════════
+const WORDS = {
+  a1: [
+    { en:'happy',      ph:'/ˈhæpi/',       ua:'щасливий',        ex:'She looks very {happy} today.',           hi:'happy' },
+    { en:'friend',     ph:'/frɛnd/',        ua:'друг',            ex:'He is my best {friend}.',                 hi:'friend' },
+    { en:'work',       ph:'/wɜːk/',         ua:'працювати / робота', ex:'I {work} every day.',                 hi:'work' },
+    { en:'house',      ph:'/haʊs/',         ua:'будинок',         ex:'They live in a big {house}.',             hi:'house' },
+    { en:'beautiful',  ph:'/ˈbjuːtɪfʊl/',  ua:'красивий',        ex:'What a {beautiful} day!',                 hi:'beautiful' },
+  ],
+  b1: [
+    { en:'achieve',    ph:'/əˈtʃiːv/',     ua:'досягати',        ex:'You can {achieve} anything you want.',    hi:'achieve' },
+    { en:'consider',   ph:'/kənˈsɪdə/',    ua:'розглядати, вважати', ex:'Please {consider} my proposal.',      hi:'consider' },
+    { en:'improve',    ph:'/ɪmˈpruːv/',    ua:'покращувати',     ex:'I want to {improve} my English.',         hi:'improve' },
+    { en:'confident',  ph:'/ˈkɒnfɪdənt/',  ua:'впевнений',       ex:'She feels very {confident} now.',         hi:'confident' },
+    { en:'challenge',  ph:'/ˈtʃælɪndʒ/',  ua:'виклик; кидати виклик', ex:'Every {challenge} makes you stronger.', hi:'challenge' },
+  ],
+  b2: [
+    { en:'ambiguous',  ph:'/æmˈbɪɡjuəs/', ua:'неоднозначний',   ex:'The instructions were {ambiguous}.',      hi:'ambiguous' },
+    { en:'resilient',  ph:'/rɪˈzɪliənt/',  ua:'стійкий, пружний', ex:'She is incredibly {resilient}.',         hi:'resilient' },
+    { en:'volatile',   ph:'/ˈvɒlətaɪl/',  ua:'нестабільний',    ex:'The market remains {volatile}.',          hi:'volatile' },
+    { en:'pragmatic',  ph:'/præɡˈmætɪk/', ua:'практичний',      ex:'Take a {pragmatic} approach.',            hi:'pragmatic' },
+    { en:'eloquent',   ph:'/ˈɛləkwənt/',  ua:'красномовний',    ex:'She gave an {eloquent} speech.',          hi:'eloquent' },
+  ],
+  c1: [
+    { en:'elusive',    ph:'/ɪˈluːsɪv/',   ua:'невловимий',      ex:'Success remained {elusive} for years.',   hi:'elusive' },
+    { en:'meticulous', ph:'/məˈtɪkjʊləs/', ua:'надзвичайно ретельний', ex:'He is {meticulous} about details.', hi:'meticulous' },
+    { en:'ephemeral',  ph:'/ɪˈfɛmərəl/',  ua:'ефемерний, минущий', ex:'Fame is often {ephemeral}.',           hi:'ephemeral' },
+    { en:'tenacious',  ph:'/tɪˈneɪʃəs/',  ua:'наполегливий, вперто цілеспрямований', ex:'Be {tenacious} in pursuit of your goals.', hi:'tenacious' },
+    { en:'nuanced',    ph:'/ˈnjuːɑːnst/', ua:'нюансований, тонкий', ex:'Her answer was {nuanced} and precise.', hi:'nuanced' },
+  ],
+};
+
+// Distractor pool for quizzes
+const DISTRACTORS = {
+  a1:['сумний','ворог','відпочивати','ліс','потворний','бігти','спати','їжа','мала','холодний'],
+  b1:['уникати','забути','погіршувати','невпевнений','відповідь','сумніватись','оголосити','зменшити','поспішати','складний'],
+  b2:['очевидний','суворий','рідкісний','стабільний','теоретичний','мовчазний','лагідний','хаотичний','пасивний','поетичний'],
+  c1:['очевидний','постійний','грубий','поверховий','стандартний','вульгарний','хаотичний','незначний','банальний','прямолінійний'],
+};
+
+// Fill-in templates: { sentence, blank, word, options, level }
+const FILLS = {
+  b1: [
+    { sentence:'I need to {_} my vocabulary every day.', word:'improve', options:['improve','forget','ignore'], ex:'поповнювати' },
+    { sentence:'This is a real {_} for the whole team.', word:'challenge', options:['challenge','holiday','answer'], ex:'виклик' },
+  ],
+  b2: [
+    { sentence:'The situation was extremely {_} and unpredictable.', word:'volatile', options:['volatile','gentle','silent'], ex:'нестабільна' },
+    { sentence:'Her {_} approach helped solve the problem quickly.', word:'pragmatic', options:['pragmatic','chaotic','passive'], ex:'практичний' },
+  ],
+  c1: [
+    { sentence:'The perfect solution remained {_}, despite months of research.', word:'elusive', options:['elusive','obvious','simple'], ex:'невловимою' },
+    { sentence:'He was {_} in checking every single detail of the report.', word:'meticulous', options:['meticulous','careless','hasty'], ex:'надзвичайно ретельним' },
+  ],
+};
+
+// ════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════
+let currentLevel = 'b2';
+let cardQueue    = [];
+let cardIndex    = 0;
+let correctCount = 0;
+let newWordsCount= 0;
+let streak       = 1;
+let isDragging   = false;
+let dragStartY   = 0;
+let dragStartTime= 0;
+let dragMoved    = false;
+
+// ════════════════════════════════════════
+// ONBOARDING
+// ════════════════════════════════════════
+function selectLevel(el, level) {
+  document.querySelectorAll('.ob-level-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  currentLevel = level;
+  document.getElementById('start-btn').disabled = false;
+}
+
+function startFeed() {
+  buildQueue();
+  showScreen('screen-feed');
+  renderCards();
+  goTo(0);
+}
+
+// ════════════════════════════════════════
+// QUEUE BUILDER — 60% new, 30% repeat, 10% hard
+// ════════════════════════════════════════
+function buildQueue() {
+  const words  = WORDS[currentLevel]  || WORDS['b2'];
+  const fills  = FILLS[currentLevel]  || FILLS['b2'];
+
+  cardQueue = [];
+
+  // 3 new word cards
+  words.slice(0,3).forEach(w => {
+    cardQueue.push({ type:'new', word:w });
+  });
+
+  // 1 quiz
+  const qWord = words[1];
+  cardQueue.push({ type:'quiz', word:qWord });
+
+  // 1 fill
+  if (fills.length) cardQueue.push({ type:'fill', fill:fills[0] });
+
+  // 2 more new words
+  words.slice(3,5).forEach(w => {
+    cardQueue.push({ type:'new', word:w });
+  });
+
+  // 1 repeat (simulated)
+  cardQueue.push({ type:'repeat', word:words[0], day:3 });
+
+  // 1 more quiz
+  const qWord2 = words[3] || words[0];
+  cardQueue.push({ type:'quiz', word:qWord2 });
+
+  // 1 more fill
+  if (fills.length > 1) cardQueue.push({ type:'fill', fill:fills[1] });
+
+  newWordsCount = cardQueue.filter(c => c.type === 'new').length;
+}
+
+// ════════════════════════════════════════
+// CARD RENDERING
+// ════════════════════════════════════════
+const LEVEL_BADGE = {
+  a1:['badge-blue','A1'],
+  b1:['badge-green','B1'],
+  b2:['badge-green','B2'],
+  c1:['badge-violet','C1'],
+};
+
+function renderCards() {
+  const vp = document.getElementById('card-viewport');
+  vp.innerHTML = '';
+
+  cardQueue.forEach((card, i) => {
+    const div = document.createElement('div');
+    div.className = 'card';
+    div.id = 'card-' + i;
+
+    const [badgeCls, badgeLbl] = LEVEL_BADGE[currentLevel] || ['badge-violet','B2'];
+
+    if (card.type === 'new') {
+      div.classList.add('card-bg-new');
+      const ex = card.word.ex.replace(
+        `{${card.word.hi}}`,
+        `<span class="ex-highlight">${card.word.hi}</span>`
+      );
+      div.innerHTML = `
+        <span class="badge ${badgeCls}">${badgeLbl} · нове слово</span>
+        <p class="word-en">${card.word.en}</p>
+        <p class="word-phonetic">${card.word.ph}</p>
+        <div class="reveal-area">
+          <p class="word-ua blurred" id="ua-${i}">${card.word.ua}</p>
+          <button class="reveal-btn" id="rbtn-${i}" onclick="revealWord(${i})">
+            👁 показати переклад
+          </button>
+        </div>
+        <div class="divider"></div>
+        <p class="ex-label">приклад</p>
+        <p class="ex-sentence">${ex}</p>
+        <div class="spacer"></div>
+        <div class="progress-dots" id="dots-${i}"></div>
+      `;
+    }
+
+    else if (card.type === 'quiz') {
+      div.classList.add('card-bg-quiz');
+      const w = card.word;
+      const distractors = (DISTRACTORS[currentLevel] || DISTRACTORS['b2'])
+        .filter(d => d !== w.ua)
+        .sort(() => Math.random()-0.5)
+        .slice(0,3);
+      const opts = [w.ua, ...distractors].sort(() => Math.random()-0.5);
+      const optHTML = opts.map(o => `
+        <div class="quiz-opt" data-correct="${o===w.ua?'1':'0'}" onclick="quizAnswer(this,'qg-${i}',${i})">${o}</div>
+      `).join('');
+      div.innerHTML = `
+        <span class="badge badge-blue">quiz · вибери переклад</span>
+        <p class="quiz-question">що означає це слово?</p>
+        <p class="quiz-word">${w.en}</p>
+        <div class="quiz-options" id="qg-${i}">${optHTML}</div>
+        <div class="spacer"></div>
+        <div class="progress-dots" id="dots-${i}"></div>
+      `;
+    }
+
+    else if (card.type === 'repeat') {
+      div.classList.add('card-bg-repeat');
+      const w = card.word;
+      div.innerHTML = `
+        <span class="badge badge-amber">повтор · день ${card.day}</span>
+        <span class="repeat-tag">⚠ складне слово</span>
+        <div class="repeat-center">
+          <p class="repeat-word">${w.en}</p>
+          <p class="repeat-phonetic">${w.ph}</p>
+          <p class="repeat-ua">${w.ua}</p>
+        </div>
+        <div class="swipe-row">
+          <div class="swipe-btn swipe-no"  onclick="swipeAnswer('no',${i})">← забув</div>
+          <span class="swipe-hint">ти знаєш?</span>
+          <div class="swipe-btn swipe-yes" onclick="swipeAnswer('yes',${i})">знаю →</div>
+        </div>
+        <div class="progress-dots" id="dots-${i}"></div>
+      `;
+    }
+
+    else if (card.type === 'fill') {
+      div.classList.add('card-bg-fill');
+      const f = card.fill;
+      const sentenceHTML = f.sentence.replace('{_}',
+        `<span class="fill-blank" id="blank-${i}">_</span>`
+      );
+      const optsHTML = f.options.map(o => `
+        <div class="fill-opt" onclick="fillAnswer(this,'fg-${i}','blank-${i}','${o}','${f.word}',${i})">${o}</div>
+      `).join('');
+      div.innerHTML = `
+        <span class="badge badge-green">B2 · встав слово</span>
+        <p class="fill-sentence">${sentenceHTML}</p>
+        <div class="fill-options" id="fg-${i}">${optsHTML}</div>
+        <div class="spacer"></div>
+        <div class="progress-dots" id="dots-${i}"></div>
+      `;
+    }
+
+    vp.appendChild(div);
+  });
+
+  updateDots();
+}
+
+// ════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════
+function goTo(idx) {
+  if (idx < 0) return;
+  if (idx >= cardQueue.length) {
+    showDone();
+    return;
+  }
+  // hide current
+  const prev = document.querySelector('.card.active');
+  if (prev) prev.classList.remove('active');
+
+  cardIndex = idx;
+  const next = document.getElementById('card-' + idx);
+  if (next) next.classList.add('active');
+  updateDots();
+}
+
+function updateDots() {
+  const wrap = document.getElementById('progress-bar-wrap');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  const total = cardQueue.length;
+  for (let j = 0; j < total; j++) {
+    const d = document.createElement('div');
+    d.className = 'pbar-dot' + (j === cardIndex ? ' active' : j < cardIndex ? ' done' : '');
+    wrap.appendChild(d);
+  }
+}
+
+// ════════════════════════════════════════
+// INTERACTIONS
+// ════════════════════════════════════════
+function revealWord(i) {
+  const ua   = document.getElementById('ua-' + i);
+  const btn  = document.getElementById('rbtn-' + i);
+  if (ua)  ua.classList.remove('blurred');
+  if (btn) btn.style.display = 'none';
+}
+
+function quizAnswer(el, groupId, cardIdx) {
+  const group = document.getElementById(groupId);
+  if (!group) return;
+  const done = group.querySelector('.correct, .wrong');
+  if (done) return;
+
+  if (el.dataset.correct === '1') {
+    el.classList.add('correct');
+    correctCount++;
+    showToast('✅', 'Правильно!', '', true, cardIdx);
+  } else {
+    el.classList.add('wrong', 'shake');
+    group.querySelectorAll('.quiz-opt').forEach(o => {
+      if (o.dataset.correct === '1') o.classList.add('correct');
+    });
+    setTimeout(() => el.classList.remove('shake'), 350);
+    showToast('❌', 'Не вірно', 'Правильна відповідь виділена', false, cardIdx);
+  }
+}
+
+function swipeAnswer(dir, cardIdx) {
+  if (dir === 'yes') {
+    correctCount++;
+    showToast('💪', 'Слово закріплено!', '', true, cardIdx);
+  } else {
+    showToast('📌', 'Додано до повторень', 'Побачиш знову через 1 день', false, cardIdx);
+  }
+}
+
+function fillAnswer(el, groupId, blankId, word, correct, cardIdx) {
+  const group = document.getElementById(groupId);
+  if (!group) return;
+  const done = group.querySelector('.correct, .wrong');
+  if (done) return;
+  const blank = document.getElementById(blankId);
+
+  if (word === correct) {
+    el.classList.add('correct');
+    if (blank) {
+      blank.textContent = word;
+      blank.style.color = 'var(--green)';
+      blank.style.borderBottomColor = 'var(--green)';
+    }
+    correctCount++;
+    showToast('🔥', 'Молодець!', '', true, cardIdx);
+  } else {
+    el.classList.add('wrong');
+    showToast('❌', 'Не вірно', `Правильно: ${correct}`, false, cardIdx);
+  }
+}
+
+// ════════════════════════════════════════
+// TOAST
+// ════════════════════════════════════════
+let toastTimer = null;
+function showToast(emoji, msg, sub, autoNext, cardIdx) {
+  const toast = document.getElementById('toast');
+  document.getElementById('toast-emoji').textContent = emoji;
+  document.getElementById('toast-msg').textContent   = msg;
+  document.getElementById('toast-sub').textContent   = sub;
+  toast.classList.add('show');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    toast.classList.remove('show');
+    if (autoNext) setTimeout(() => goTo(cardIdx + 1), 150);
+    else          setTimeout(() => goTo(cardIdx + 1), 800);
+  }, 900);
+}
+
+// ════════════════════════════════════════
+// SWIPE / DRAG NAVIGATION
+// ════════════════════════════════════════
+const vp = document.getElementById('card-viewport') || document.body;
+
+document.addEventListener('touchstart', e => {
+  dragStartY    = e.touches[0].clientY;
+  dragStartTime = Date.now();
+  dragMoved     = false;
+}, { passive: true });
+
+document.addEventListener('touchmove', e => {
+  if (Math.abs(e.touches[0].clientY - dragStartY) > 10) dragMoved = true;
+}, { passive: true });
+
+document.addEventListener('touchend', e => {
+  if (!dragMoved) return;
+  const dy = dragStartY - e.changedTouches[0].clientY;
+  const dt = Date.now() - dragStartTime;
+  const target = e.target;
+  const isBtn = target.closest('button, .quiz-opt, .fill-opt, .swipe-btn, .reveal-btn, .ob-level-btn, .ob-start-btn');
+  if (isBtn && Math.abs(dy) < 80) return;
+  if (Math.abs(dy) > 40 && dt < 600) {
+    dy > 0 ? goTo(cardIndex + 1) : goTo(cardIndex - 1);
+  }
+}, { passive: true });
+
+// Mouse drag (desktop)
+document.addEventListener('mousedown', e => {
+  const isBtn = e.target.closest('button, .quiz-opt, .fill-opt, .swipe-btn, .reveal-btn, .ob-level-btn, .ob-start-btn');
+  if (isBtn) return;
+  isDragging    = true;
+  dragStartY    = e.clientY;
+  dragStartTime = Date.now();
+  dragMoved     = false;
+});
+document.addEventListener('mousemove', e => {
+  if (!isDragging) return;
+  if (Math.abs(e.clientY - dragStartY) > 10) dragMoved = true;
+});
+document.addEventListener('mouseup', e => {
+  if (!isDragging) return;
+  isDragging = false;
+  if (!dragMoved) return;
+  const dy = dragStartY - e.clientY;
+  const dt = Date.now() - dragStartTime;
+  if (Math.abs(dy) > 35 && dt < 600) {
+    dy > 0 ? goTo(cardIndex + 1) : goTo(cardIndex - 1);
+  }
+});
+
+// ════════════════════════════════════════
+// SCREEN MANAGEMENT
+// ════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function showDone() {
+  document.getElementById('stat-correct').textContent = correctCount;
+  document.getElementById('stat-words').textContent   = newWordsCount;
+  document.getElementById('stat-streak').textContent  = streak;
+  document.getElementById('streak-count').textContent = streak;
+  showScreen('screen-done');
+}
+
+function restartFeed() {
+  correctCount  = 0;
+  cardIndex     = 0;
+  buildQueue();
+  showScreen('screen-feed');
+  renderCards();
+  goTo(0);
+}
+</script>
+</body>
+</html>
